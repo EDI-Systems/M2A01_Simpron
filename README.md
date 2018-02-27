@@ -13,7 +13,25 @@ This software is licensed under the MIT license.
 ## Quick Demo
 ### Normal coroutines
 ```C
- 
+unsigned int Shared;
+void Task1(void)
+{
+    SYS_TASK_BEGIN();
+
+    case 
+    SYS_YIELD();
+
+    SYS_TASK_END();
+}
+
+void Task2(void)
+{
+    SYS_TASK_BEGIN();
+
+    SYS_YIELD();
+
+    SYS_TASK_END();
+}
 ```
 
 ### Interrupt coroutines 
