@@ -1,3 +1,7 @@
+<h1 align="center">
+	<img width="300" src="https://raw.githubusercontent.com/EDI-Systems/M2A1_MuSimpron/master/logo.png" alt="logo">
+</h1>
+
 # Proto Machine (RMS)
 
 点击 **[这里](README_CN.md)** 查看中文版。
