@@ -25,15 +25,15 @@ void Task1(void)
     {
         TASK_STATE=TASK1_STATE2;
         printf("Task 1: State 1 -> State 2\n");
-		Delay(1);
+        Delay(1);
         SYS_YIELD();
     }
 
     case TASK1_STATE2:
     {
         TASK_STATE=TASK1_STATE1;
-		printf("Task 1: State 2 -> State 1\n");
-		Delay(1);
+        printf("Task 1: State 2 -> State 1\n");
+        Delay(1);
         SYS_YIELD();
     }
 
@@ -53,16 +53,16 @@ void Task2(void)
     case TASK2_STATE1:
     {
         TASK_STATE=TASK2_STATE2;
-		printf("Task 2: State 1 -> State 2\n");
-		Delay(1);
+        printf("Task 2: State 1 -> State 2\n");
+        Delay(1);
         SYS_YIELD();
     }
 
     case TASK2_STATE2:
     {
         TASK_STATE=TASK2_STATE1;
-		printf("Task 2: State 2 -> State 1\n");
-		Delay(1);
+        printf("Task 2: State 2 -> State 1\n");
+        Delay(1);
         SYS_YIELD();
     }
 
