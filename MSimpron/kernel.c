@@ -5,31 +5,16 @@ Date        : 15/11/2014
 Description : The kernel of the FSM-Simpron proto-RTOS.
               This FSM, or barely an RTOS, has only a single stack, and might be the
               simplest RTOS made ever.
-
-The system scheduler module is one that:
-1> Supports 120 number of threads (not processes and pseudo-processes), and the
-   implemented number is only limited by the available RAM of the MCU;
-2> Support dynamic thread management including deletion and setup
-3> Does not require a system timer.
-4> DOES NOT support priority.
-5> The system also does not support zombie thread and thread return value.
-6> When used, all task slots must be filled. An empty task slot will cause
-   undefined behavior.
-7> Switch-case statement cannot be used in any task function. Use if-else instead.
-   
-In very tiny places, these features have advantages as follows:
-1> Save a system timer, which is especially important in the 8051 or AVR systems where
-   the system timer is a rare resource;
-2> This OS does not involve stack manipulation, so it can readily run on PIC MCUs.
-3> Quick in thread context switching.
-4> Makes extremely rapid simple system development possible, especially when the system
-   is simple.
+              The characteristics of this finite state machine include:
+              1> Supports 120 threads, and the number is only limited by the available memory;
+              2> Does not require a system timer.
+              3> Does not support priority, and scheduling is cooperative.
 ******************************************************************************/
 
 /* Includes ******************************************************************/
-/* Put all MCU related code here */
-#include "iom8.h"
-#include "ina90.h"
+/* Include all your MCU related header here */
+#include "stdio.h"
+#include "time.h"
 /* End Includes **************************************************************/
 
 /* Defines *******************************************************************/
@@ -39,25 +24,41 @@ In very tiny places, these features have advantages as follows:
 /* System definitions */
 #define TASK_STATE           TCB[Cur_TID]
 #define SYS_TASK_BEGIN()     while(1)switch(TCB[Cur_TID]){
-/* If possible, do not use wait */
-/* #define SYS_WAIT_TRUE(X)     case __LINE__:if((X)==0){TCB[Cur_TID]=__LINE__;Cur_TID=(Cur_TID+1)%SYS_TASK_NUM;return;} */
 #define SYS_YIELD()          {Cur_TID=(Cur_TID+1)%SYS_TASK_NUM;return;}
 #define SYS_TASK_END()       };
                      
 #define INT_TASK_BEGIN(X)    switch(X){
 #define INT_YIELD()          return;
 #define INT_TASK_END()       };
+
+/* Define all your task states here */
+#define TASK1_STATE1         0
+#define TASK1_STATE2         1
+
+#define TASK2_STATE1         0
+#define TASK2_STATE2         1
 /* End Defines ***************************************************************/
 
 /* Typedefs ******************************************************************/
+/* Define this according to your compiler settings */
 typedef unsigned char u8;
-typedef unsigned int u16;
 /* End Typedefs **************************************************************/
 
 /* Global Variables **********************************************************/
 u8 Cur_TID;
-u16 TCB[SYS_TASK_NUM];
+u8 TCB[SYS_TASK_NUM];
 /* End Global Variables ******************************************************/
+
+/* User supplied delay functions for demo */
+void Delay(int Sec)
+{
+    clock_t Start;
+    clock_t Time;
+    
+    Start=clock();
+    Time=(clock_t)Sec*CLOCKS_PER_SEC;
+    while((clock()-Start)<Time);
+}
 
 /* Begin Function:Task1 *******************************************************
 Description : The test task 1.
@@ -67,14 +68,29 @@ Return      : None.
 ******************************************************************************/
 void Task1(void)
 {
-    /* The program between the header and the end is run repeatedly. 
-     * No extra while() is needed.
-     */
     SYS_TASK_BEGIN();
 
     /* User program */
+    case TASK1_STATE1:
+    {
+        TASK_STATE=TASK1_STATE2;
+        printf("Task 1: State 1 -> State 2\n");
+        Delay(1);
+        SYS_YIELD();
+    }
 
-    SYS_YIELD();
+    case TASK1_STATE2:
+    {
+        TASK_STATE=TASK1_STATE1;
+        printf("Task 1: State 2 -> State 1\n");
+        Delay(1);
+        SYS_YIELD();
+    }
+
+    default:
+    {
+        SYS_YIELD();
+    }
 
     SYS_TASK_END();
 }
@@ -88,14 +104,29 @@ Return      : None.
 ******************************************************************************/
 void Task2(void)
 {
-    /* The program between the header and the end is run repeatedly. 
-     * No extra while() is needed.
-     */
     SYS_TASK_BEGIN();
     
     /* User program */
+    case TASK2_STATE1:
+    {
+        TASK_STATE=TASK2_STATE2;
+        printf("Task 2: State 1 -> State 2\n");
+        Delay(1);
+        SYS_YIELD();
+    }
 
-    SYS_YIELD();
+    case TASK2_STATE2:
+    {
+        TASK_STATE=TASK2_STATE1;
+        printf("Task 2: State 2 -> State 1\n");
+        Delay(1);
+        SYS_YIELD();
+    }
+
+    default:
+    {
+        SYS_YIELD();
+    }
 
     SYS_TASK_END();
 }
@@ -107,26 +138,84 @@ Input       : None.
 Output      : None.
 Return      : int-dummy.
 ******************************************************************************/
-int main(void)    	                                                    
+int main(void)                                                            
 {    
     /* Initialize the scheduler */
     for(Cur_TID=0;Cur_TID<SYS_TASK_NUM;Cur_TID++)
         TCB[Cur_TID]=0;
     Cur_TID=0;
 
-    /* Call all your task functions here one by one,sequentially, no more, no less */
+    /* Call all your task functions here one by one, sequentially, no more, no less */
     while(1)
     {
         Task1();
         Task2();
-    }       
-           
-    /* Never return */                         	    	    	    	    	    	               
-    return(0);  
+    }
+
+    /* Never return */
+    return(0);
+
+/* For interrupt tasks, call your tasks sequentially in the interrupt handler, and
+   declare a variable to store its state.The interrupt handler which contains two
+   tasks that respectively switch toggle their own states should look like:
+
+#define INT1_STATE_1         0
+#define INT1_STATE_2         1
+
+#define INT2_STATE_1         0
+#define INT2_STATE_2         1
+
+u8 Int_State_1=0;
+u8 Int_State_2=0;
+
+void Int_Task_1(void)
+{
+    INT_TASK_BEGIN(Int_State_1);
+
+    case INT1_STATE_1:
+    {
+        Int_State_1=INT1_STATE_2;
+        INT_YIELD();
+    }
+
+    case INT1_STATE_2:
+    {
+        Int_State_1=INT1_STATE_1;
+        INT_YIELD();
+    }
+
+    INT_TASK_END();
+}
+
+void Int_Task_2(void)
+{
+    INT_TASK_BEGIN(Int_State_2);
+
+    case INT2_STATE_1:
+    {
+        Int_State_2=INT2_STATE_2;
+        INT_YIELD();
+    }
+
+    case INT2_STATE_2:
+    {
+        Int_State_2=INT2_STATE_1;
+        INT_YIELD();
+    }
+
+    INT_TASK_END();
+}
+
+void Handler(void)
+{
+    Int_Task_1();
+    Int_Task_2();
+}
+*/
 }
 /* End Function:main *********************************************************/
 
 /* End Of File ***************************************************************/
 
-/* Copyright (C) 2011-2013 Evo-Devo Instrum. All rights reserved *************/
+/* Copyright (C) Evo-Devo Instrum. All rights reserved ***********************/
 
