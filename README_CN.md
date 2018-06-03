@@ -134,7 +134,7 @@ void Handler(void)
 ## 新手上路
 
 &emsp;&emsp;拷贝本文件到你的工程文件夹中，并使用它作为主文件即可。只要你有一个C编译器，就可以无需移植而使用它。提供的“内核”文件包含了例子程序，它会用printf打印出当前的两个任务的状态。我们提供了一个 _Visual Studio_ 的工程作为示例；如果想要使用gcc，只需要在命令行键入_gcc -o RMS.elf kernel.c_ 即可。在批量产品中使用本系统应该是非常简单的。本系统没有额外的文档，因为它足够简单易懂。  
-&emsp;&emsp;在使用时，应当注意本系统是为4位和8位单片机设计的，而不是高性能的单片机或者应用处理器。当然，在高端处理器上运行本软件也是可行的。但是，这样会很浪费高端处理器的额外资源。对于16和32位的微控制器，可以考虑使用 [M5P1_MuProkaron](https://github.com/EDI-Systems/M5P1_MuProkaron) _小型实时系统_ ；对于高端的32位单片机或者应用处理器， [M7M1_MuEukaron](https://github.com/EDI-Systems/M7M1_MuProkaron) _实时多核心微内核_ 可能是一个更好的选择.
+&emsp;&emsp;在使用时，应当注意本系统是为4位和8位单片机设计的，而不是高性能的单片机或者应用处理器。当然，在高端处理器上运行本软件也是可行的。但是，这样会很浪费高端处理器的额外资源。对于16和32位的微控制器，可以考虑使用 [M5P1_MuProkaron](https://github.com/EDI-Systems/M5P1_MuProkaron) _小型实时系统_ ；对于高端的32位单片机或者应用处理器， [M7M1_MuEukaron](https://github.com/EDI-Systems/M7M1_MuEukaron) _实时多核心微内核_ 可能是一个更好的选择.
 
 ## EDI 工程信息
 &emsp;&emsp;突越 - 太古 - 原初 (M2A1 R3T1)
