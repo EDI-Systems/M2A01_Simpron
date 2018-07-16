@@ -4,11 +4,11 @@ Author      : pry
 Date        : 15/11/2014                
 Description : The kernel of the FSM-Simpron proto-RTOS.
               This FSM, or barely an RTOS, has only a single stack, and might be the
-              simplest RTOS made ever.
+              simplest RTOS made ever, yet still fully preemptive.
               The characteristics of this finite state machine include:
-              1> Supports 120 threads, and the number is only limited by the available memory;
-              2> Does not require a system timer.
-              3> Does not support priority, and scheduling is cooperative.
+              1> The number of threads is only limited by the available memory;
+              2> Does not require a system timer, or even require working interrupts.
+              3> Different priorities are implemented with hardware interrupt priorities.
 ******************************************************************************/
 
 /* Includes ******************************************************************/
