@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\MSimpron\kernel.c">
+    <ClCompile Include="..\..\Source\kernel.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
