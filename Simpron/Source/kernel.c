@@ -11,13 +11,13 @@ Description : The kernel of the FSM-Simpron proto-RTOS.
               3> Different priorities are implemented with hardware interrupt priorities.
 ******************************************************************************/
 
-/* Includes ******************************************************************/
+/* Include *******************************************************************/
 /* Include all your MCU related header here */
 #include "stdio.h"
 #include "time.h"
-/* End Includes **************************************************************/
+/* End Include ***************************************************************/
 
-/* Defines *******************************************************************/
+/* Define ********************************************************************/
 /* Configuration definitions */
 #define SYS_TASK_NUM         2
 
@@ -37,17 +37,17 @@ Description : The kernel of the FSM-Simpron proto-RTOS.
 
 #define TASK2_STATE1         0
 #define TASK2_STATE2         1
-/* End Defines ***************************************************************/
+/* End Define ****************************************************************/
 
-/* Typedefs ******************************************************************/
+/* Typedef *******************************************************************/
 /* Define this according to your compiler settings */
 typedef unsigned char u8;
-/* End Typedefs **************************************************************/
+/* End Typedef ***************************************************************/
 
-/* Global Variables **********************************************************/
+/* Variable ******************************************************************/
 u8 Cur_TID;
 u8 TCB[SYS_TASK_NUM];
-/* End Global Variables ******************************************************/
+/* End Variable **************************************************************/
 
 /* User supplied delay functions for demo */
 void Delay(int Sec)
@@ -60,7 +60,7 @@ void Delay(int Sec)
     while((clock()-Start)<Time);
 }
 
-/* Begin Function:Task1 *******************************************************
+/* Function:Task1 *************************************************************
 Description : The test task 1.
 Input       : None.
 Output      : None.
@@ -96,7 +96,7 @@ void Task1(void)
 }
 /* End Function:Task1 ********************************************************/
 
-/* Begin Function:Task2 *******************************************************
+/* Function:Task2 *************************************************************
 Description : The test task 2.
 Input       : None.
 Output      : None.
@@ -132,7 +132,7 @@ void Task2(void)
 }
 /* End Function:Task2 ********************************************************/
 
-/* Begin Function:main ********************************************************
+/* Function:main **************************************************************
 Description : The entrance of the FSM/RTOS.
 Input       : None.
 Output      : None.
