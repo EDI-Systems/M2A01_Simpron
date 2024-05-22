@@ -87,17 +87,18 @@ Description : The "kernel" of the RMS. This is a set of macros for efficient
 
 /* Define ********************************************************************/
 /* Basic structure  - self-explanatory */
-#define RMS_BEGIN(X)        static unsigned char RMS_STATE=(X); \
-                            RMS_LABEL: \
-                            switch(RMS_STATE){
+#define RMS_BEGIN(T,X)      static T __RMS_STATE__=(X); \
+                            __RMS_LABEL__: \
+                            switch(__RMS_STATE__){
 #define RMS_EXECUTE(X)      case(X)
 #define RMS_CATCH()         default
+#define RMS_STATE(S)        (__RMS_STATE__=(S))
 #define RMS_YIELD()         return
 #define RMS_YIELD_RV(V)     return(V)
 #define RMS_END()           }
 
 /* Helper macros - self-explanatory */
-#define RMS_CONTINUE()      goto RMS_LABEL
+#define RMS_CONTINUE()      goto __RMS_LABEL__
 #define RMS_WAIT(X) \
 do \
 { \

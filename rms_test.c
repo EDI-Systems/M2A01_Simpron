@@ -72,7 +72,7 @@ Return      : int - The current exit state.
 ******************************************************************************/
 int Task1(void)
 {
-    RMS_BEGIN(TASK1_CATCH);
+    RMS_BEGIN(char,TASK1_CATCH);
 
     /* User program */
     RMS_EXECUTE(TASK1_STATE1):
@@ -80,7 +80,7 @@ int Task1(void)
         printf("Task 1: State 1 -> State 2.\n");
         fflush(stdout);
         Delay(1);
-        RMS_STATE=TASK1_STATE2;
+        RMS_STATE(TASK1_STATE2);
         RMS_CONTINUE();
     }
 
@@ -89,7 +89,7 @@ int Task1(void)
         printf("Task 1: State 2 -> State 1.\n");
         fflush(stdout);
         Delay(1);
-        RMS_STATE=TASK1_STATE1;
+        RMS_STATE(TASK1_STATE1);
         RMS_YIELD_RV(0);
     }
 
@@ -100,7 +100,7 @@ int Task1(void)
         Delay(1);
         RMS_WAIT_RV(Task1_Start!=0,2);
         printf("Task 1: Start flag received.\n");
-        RMS_STATE=TASK1_STATE1;
+        RMS_STATE(TASK1_STATE1);
         RMS_YIELD_RV(1);
     }
 
@@ -116,7 +116,7 @@ Return      : None.
 ******************************************************************************/
 void Task2(void)
 {
-    RMS_BEGIN(TASK2_STATE1);
+    RMS_BEGIN(char,TASK2_STATE1);
     
     /* User program */
     RMS_EXECUTE(TASK2_STATE1):
@@ -124,7 +124,7 @@ void Task2(void)
         printf("Task 2: State 1 -> State 2.\n");
         fflush(stdout);
         Delay(1);
-        RMS_STATE=TASK2_STATE2;
+        RMS_STATE(TASK2_STATE2);
         RMS_YIELD();
     }
 
@@ -134,13 +134,13 @@ void Task2(void)
         fflush(stdout);
         Delay(1);
         Task1_Start=1;
-        RMS_STATE=TASK2_STATE1;
+        RMS_STATE(TASK2_STATE1);
         RMS_CONTINUE();
     }
 
     RMS_CATCH():
     {
-        RMS_STATE=TASK2_STATE1;
+        RMS_STATE(TASK2_STATE1);
         RMS_YIELD();
     }
 

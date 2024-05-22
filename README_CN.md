@@ -7,12 +7,12 @@
 Click **[HERE](README.md)** for English version.
 
 &emsp;&emsp;**RMS** 是一个为4位和8位经济型微控制器设计的羽量级状态机协程库。
-- 4位和8位单片机的多项目验证操作系统
+- 的经多个项目验证的4位和8位机专用系统
 - 容忍任何使用C编译器的古怪架构
-- 无需为每个协程准备一个单独的栈
+- 无需为每个协程准备单独的运行栈
 - 完全无需编写汇编或者移植代码
-- 极度简单，接近0的内存切换开销
-- 显式暴露的任务状态促使程序员进行形式化思考
+- 极度简单并几乎不消耗任何内存
+- 显式暴露任务状态以鼓励形式化思考
 
 ## 如何使用此RMS“内核”？
 
@@ -34,9 +34,9 @@ Click **[HERE](README.md)** for English version.
 
 &emsp;&emsp;在低端微控制器编程中，每一个bit都很重要。通常首先是RAM用尽，然后是Flash，最后是CPU。这与高端平台不同，在高端平台中CPU通常是瓶颈。RAM通常取决于你声明了多少变量，因此可以很容易控制。然而，Flash则不同，无休止的错误修复和新功能会缓慢而稳定地消耗储备。如果你一开始就采用一个臃肿的框架，然后发现在最后修复错误时Flash空间不足，你可能就无药可救了。定时器等也是同理，如8051只有两个定时器，如果系统垄断了一个，那么你就只剩下一个定时器了。考虑到这些因素，RMS被设计为不强制要求许多功能，同时又足够灵活，允许程序员以一种简单、特定于项目且内存效率高的方式实现这些功能。
 
-## 这怎么不是山寨版Protothreads？
+## 这难道不是山寨版Protothreads吗？
 
-&emsp;&emsp;尽管技术上有相似之处，RMS选择公开任务的内部状态，迫使程序员**形式化**思考系统并将不同状态分离到各自的执行中。这在设计需要严格认证的工业产品时非常有用，因为你需要将预定义的状态转换图转化为代码。此外，这种设计(1)不会受到执行中可能存在的switch-cases的意外冲突的影响，(2)不需要编译器特定的扩展，(3)每个任务只需要1字节的RAM，相比之下Protothreads需要两字节。
+&emsp;&emsp;尽管技术上有相似之处，RMS选择公开任务的内部状态，迫使程序员**形式化**地思考系统并将不同状态分离到各自的执行中。这在设计需要严格认证的工业产品时非常有用，因为你需要将预定义的状态转换图转化为代码，而这种状态转换图的正确性可以很方便地用UPPAAL等工具验证。此外，这种设计(1)不会受到执行中可能存在的switch-cases的意外冲突的影响，(2)不需要编译器特定的扩展，(3)每个任务最少只需要1字节（在编译器允许的状况下，甚至少于1字节）的RAM，相比之下Protothreads需要两字节或更多。
 
 ## 快速演示
 ### 只需将其复制并粘贴到C文件中，然后使用任何C编译器进行编译
@@ -66,7 +66,7 @@ void Delay(int Sec)
 
 int Task1(void)
 {
-    RMS_BEGIN(TASK1_CATCH);
+    RMS_BEGIN(char,TASK1_CATCH);
 
     /* User program */
     RMS_EXECUTE(TASK1_STATE1):
@@ -74,7 +74,7 @@ int Task1(void)
         printf("Task 1: State 1 -> State 2.\n");
         fflush(stdout);
         Delay(1);
-        RMS_STATE=TASK1_STATE2;
+        RMS_STATE(TASK1_STATE2);
         RMS_CONTINUE();
     }
 
@@ -83,7 +83,7 @@ int Task1(void)
         printf("Task 1: State 2 -> State 1.\n");
         fflush(stdout);
         Delay(1);
-        RMS_STATE=TASK1_STATE1;
+        RMS_STATE(TASK1_STATE1);
         RMS_YIELD_RV(0);
     }
 
@@ -94,7 +94,7 @@ int Task1(void)
         Delay(1);
         RMS_WAIT_RV(Task1_Start!=0,2);
         printf("Task 1: Start flag received.\n");
-        RMS_STATE=TASK1_STATE1;
+        RMS_STATE(TASK1_STATE1);
         RMS_YIELD_RV(1);
     }
 
@@ -103,7 +103,7 @@ int Task1(void)
 
 void Task2(void)
 {
-    RMS_BEGIN(TASK2_STATE1);
+    RMS_BEGIN(char,TASK2_STATE1);
     
     /* User program */
     RMS_EXECUTE(TASK2_STATE1):
@@ -111,7 +111,7 @@ void Task2(void)
         printf("Task 2: State 1 -> State 2.\n");
         fflush(stdout);
         Delay(1);
-        RMS_STATE=TASK2_STATE2;
+        RMS_STATE(TASK2_STATE2);
         RMS_YIELD();
     }
 
@@ -121,13 +121,13 @@ void Task2(void)
         fflush(stdout);
         Delay(1);
         Task1_Start=1;
-        RMS_STATE=TASK2_STATE1;
+        RMS_STATE(TASK2_STATE1);
         RMS_CONTINUE();
     }
 
     RMS_CATCH():
     {
-        RMS_STATE=TASK2_STATE1;
+        RMS_STATE(TASK2_STATE1);
         RMS_YIELD();
     }
 

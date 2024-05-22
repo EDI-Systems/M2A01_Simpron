@@ -32,7 +32,7 @@
 &ensp;&ensp;In low-end microcontroller programming, every single bit count. You typically run out of RAM first, then Flash, and finally CPU, as opposed to higher-end platforms where CPU is the bottleneck. RAM typically depends on how many variables you declare thus can be easily controlled. __Flash however, is different__; the endless bug fixes and new features will chew through reserves slowly but stadily. If you adopt a bloated framework from the beginning and find yourself out of Flash for bug fixing towards the end, you're probably beyond salvation. The same goes for timers, etc, as 8051 only have two timers; if the system monopolizes one then you only have a single one left. Taking these into account, the RMS is designed without mandating many features, while being flexible enough to allow the programmer to implement them in a simple, __project-specific__, and __memory-efficient__ way.
 
 ## How's this not a copycat of Protothreads?
-&ensp;&ensp;Despite the technical similarities, RMS choose to __expose the internal states of the tasks__, forcing the programmer to think __formally__ about the system and separate different states into __individual executions__. This is very useful when designing industrial products that require strict certification, where you need to translate a predefined state transition diagram into code. In addition, this design (1) doesn't suffer from surprise conflicts with the possible switch-cases inside each execution, (2) doesn't need compiler-specific expensions, and (3) only needs one byte of RAM as opposed to two for each task.
+&ensp;&ensp;Despite the technical similarities, RMS choose to __expose the internal states of the tasks__, forcing the programmer to think __formally__ about the system and separate different states into __individual executions__. This is very useful when designing industrial products that require strict certification, where you need to translate a predefined state transition diagram into code. The correctness of the state transition diagram can be easily verified by tools such as UPPAAL. In addition, this design (1) doesn't suffer from surprise conflicts with the possible switch-cases inside each execution, (2) doesn't need compiler-specific expensions, and (3) only needs one byte of RAM (or even less if the compiler would permit) for each task as opposed to two in Protothrerads.
 
 ## Quick Demo
 ### Just copy and past this into a C file and compile with any C compiler
@@ -62,7 +62,7 @@ void Delay(int Sec)
 
 int Task1(void)
 {
-    RMS_BEGIN(TASK1_CATCH);
+    RMS_BEGIN(char,TASK1_CATCH);
 
     /* User program */
     RMS_EXECUTE(TASK1_STATE1):
@@ -70,7 +70,7 @@ int Task1(void)
         printf("Task 1: State 1 -> State 2.\n");
         fflush(stdout);
         Delay(1);
-        RMS_STATE=TASK1_STATE2;
+        RMS_STATE(TASK1_STATE2);
         RMS_CONTINUE();
     }
 
@@ -79,7 +79,7 @@ int Task1(void)
         printf("Task 1: State 2 -> State 1.\n");
         fflush(stdout);
         Delay(1);
-        RMS_STATE=TASK1_STATE1;
+        RMS_STATE(TASK1_STATE1);
         RMS_YIELD_RV(0);
     }
 
@@ -90,7 +90,7 @@ int Task1(void)
         Delay(1);
         RMS_WAIT_RV(Task1_Start!=0,2);
         printf("Task 1: Start flag received.\n");
-        RMS_STATE=TASK1_STATE1;
+        RMS_STATE(TASK1_STATE1);
         RMS_YIELD_RV(1);
     }
 
@@ -99,7 +99,7 @@ int Task1(void)
 
 void Task2(void)
 {
-    RMS_BEGIN(TASK2_STATE1);
+    RMS_BEGIN(char,TASK2_STATE1);
     
     /* User program */
     RMS_EXECUTE(TASK2_STATE1):
@@ -107,7 +107,7 @@ void Task2(void)
         printf("Task 2: State 1 -> State 2.\n");
         fflush(stdout);
         Delay(1);
-        RMS_STATE=TASK2_STATE2;
+        RMS_STATE(TASK2_STATE2);
         RMS_YIELD();
     }
 
@@ -117,13 +117,13 @@ void Task2(void)
         fflush(stdout);
         Delay(1);
         Task1_Start=1;
-        RMS_STATE=TASK2_STATE1;
+        RMS_STATE(TASK2_STATE1);
         RMS_CONTINUE();
     }
 
     RMS_CATCH():
     {
-        RMS_STATE=TASK2_STATE1;
+        RMS_STATE(TASK2_STATE1);
         RMS_YIELD();
     }
 
