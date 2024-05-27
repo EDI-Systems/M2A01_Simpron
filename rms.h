@@ -40,9 +40,9 @@ Description : The "kernel" of the RMS. This is a set of macros for efficient
               All tasks executions are run-to-completion hence preemptions
               within a single thread are impossible; however, it is possible
               to write the interrupt handlers as a task (or even a thread
-              hosting multiple tasks) to circumvent this limitation, and
-              multiple preemption priorities may be reached through hardware
-              interrupt nesting. 
+              hosting multiple tasks; see 2009 RTAS paper "Sloth: Threads as 
+              Interrupts") to circumvent this limitation, and multiple preemption
+              priorities may be reached through hardware interrupt nesting. 
               For interrupt activation detections, it is recommended to reserve
               a flag for each of them, and detect if this flag is set in the
               appropriate task execution. If a flag being waited on is not set,
